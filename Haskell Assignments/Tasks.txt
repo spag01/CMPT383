@@ -1,0 +1,136 @@
+module Tasks where
+import Data.Char
+--Question1: Area of triangle
+
+triangle_area b h 
+ | b <=0 = error "triangle_area: b<=0"
+ | h <=0 = error "triangle_area: h<=0"
+ |otherwise = (b*h)/2
+
+--Question2: Heron's Formula
+
+heron_area a b c 
+ | a <=0 = error "heron_area: a must be positive"
+ | b <=0 = error "heron_area: b must be positive"
+ | c <=0 = error "heron_area: c must be positive"
+ | (s-a)*(s-b)*(s-c) <0 = error "heron_area: not a triangle"
+ |otherwise = sqrt(s*(s-a)*(s-b)*(s-c))
+    where s = (a+b+c)/2
+    
+--Question3: Elements of a list
+
+--Part(1)
+fifth1 :: [a] -> a
+fifth1 lst = head(tail(tail(tail(tail lst))))
+
+--Part(2)
+fifth2 :: [a] -> a
+fifth2 lst = head(drop 4 (take 5 lst))
+
+--Part(3)
+get :: Int -> [p] -> p
+get n [] = error "the list is empty"
+get n lst = last ( take (n+1) lst)
+
+--Question4: SFU Semester codes
+
+--Part(1)
+is_in c [] = False
+is_in c s = 
+    if head s == c then True else  is_in c (tail s)
+
+digits = "0123456789"
+
+is_valid_code :: [Char] -> Bool
+is_valid_code str =
+    case str of
+        [a, b, c ,d] -> (is_in a "10") && (is_in b digits) && (is_in c digits) && (is_in d "147")
+        _ -> False
+
+--Part(2)
+code2sem :: [Char] -> [Char]
+code2sem [a, b, c, d] = 
+    season ++ " " ++ century ++ year
+    where 
+        season = case d of
+                    '1' -> "Spring"
+                    '4' -> "Summer"
+                    '7' -> "Fall"
+                    _ -> error "wrong input"
+
+        century = case a of
+                    '0' -> "19"
+                    '1' -> "20"
+                    _ -> error "wrong input"
+        year = b : c : []
+
+code2sem _ = error "wrong input"
+
+--Part(3)
+sem2code str = 
+    century ++ year ++ season
+    where 
+        [season_str, full_year] = words str
+        season = case season_str of 
+                     "Spring" -> "1"
+                     "Summer" -> "4"
+                     "Fall" -> "7"
+                     _ -> error "wrong input"
+        century = case (head full_year) of
+            '1' -> "0"
+            '2' -> "1"
+            _ -> error "wrong input"
+        year = drop 2 full_year
+
+--Question5: Min and Max
+
+--Part(1)
+min3 x y z = 
+    if x > y 
+    then (if z > y then y else z)
+    else (if x > z then z else x)
+
+--Part(2)
+max3 x y z = 
+    if x > y 
+    then (if z > x then z else x)
+    else (if y > z then y else z)
+
+--Part(3)
+middle1 x y z = 
+    if x > y 
+    then (if z > x then x else (if z > y then z else y))
+    else (if z > y then y else (if z > x then z else x))
+
+--Part(4)
+middle2 x y z = (x + y + z) - (max3 x y z) - (min3 x y z)
+
+--Part(5)
+middle_test mid =
+    [([x, y, z], q) | ([x, y, z], value) <- tests, let q = (mid x y z), q /= value]
+    where 
+        tests = [
+            ([1, 2, 3], 2),
+            ([1, 3, 2], 2),
+            ([3, 2, 1], 2),
+            ([3, 1, 2], 2),
+            ([2, 1, 3], 2),
+            ([2, 3, 1], 2),
+            ([-1, 2, 3], 2),
+            ([-1, 3, 2], 2),
+            ([2, -1, 3], 2),
+            ([3, -1, 2], 2)
+            ]
+
+middle_bug x y z = max (min x y ) (min y z)
+
+
+--Question6: Unique Strings
+
+is_unique "" = True
+is_unique [_] = True
+is_unique (x:y:xs) = x /= y && is_unique (y:xs)
+
+uniquify "" = ""
+uniquify [c] = c:[]
+uniquify (x:y:rst) = if x == y then uniquify (x :  rst) else x : (uniquify (y:rst))
